@@ -96,7 +96,7 @@ The final dataset folder structure should as follows:
 
 ### 
 
-### Model Donwload
+### Model Download
 
 You need to download the cooperative 3D detection models [here](github.com/ucla-mobility/V2V4Real?tag=readme-ov-file#benchmark), and unzip them in the model folder.
 
@@ -225,7 +225,7 @@ $ python opencood/rq2/rq3_inference.py --scale 0.1 --method ori --dataset_dir ${
 ├── rq2                   rq2 data generation and visulization
 ├── requirements.txt
 ├── rq_tools.py           init dataset
-├── copy_pcd_files.py
+├── dataset_init.py
 ├── logger.py             log
 ├── setup.py
 └── visual.py
