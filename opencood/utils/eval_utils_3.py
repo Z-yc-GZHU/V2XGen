@@ -194,16 +194,24 @@ def eval_final_results(result_stat, save_path, range=""):
 def get_occ_error(ego_gen_param, cp_gen_param, false_pred_ids):
     total_occ = 0
     occ_error = 0
-    occ_threshold = 0
+    occ_threshold = 0.05
+    cp_occ_threshold = 0.5
 
     for car_id, param_dict in ego_gen_param.items():
-        if param_dict['ego_occlusion_rate'] > occ_threshold:
+        if car_id in cp_gen_param:
+            cp_occlusion_rate = cp_gen_param[car_id]['cp_occlusion_rate']
+        else:
+            cp_occlusion_rate = param_dict['cp_occlusion_rate']
+
+        if (param_dict['ego_occlusion_rate'] > occ_threshold and
+                cp_occlusion_rate < cp_occ_threshold):
             if car_id in false_pred_ids:
                 occ_error += 1
             total_occ += 1
 
     for car_id, param_dict in cp_gen_param.items():
-        if param_dict['ego_occlusion_rate'] > occ_threshold:
+        if (param_dict['ego_occlusion_rate'] > occ_threshold and
+                param_dict['cp_occlusion_rate'] < cp_occ_threshold):
             if car_id in false_pred_ids:
                 occ_error += 1
             total_occ += 1
@@ -231,8 +239,7 @@ def get_long_distance_error(ego_gen_param, cp_gen_param, false_pred_ids, distanc
 
 
 def method_eval_result(method_stat, result_stat, model_dir, scale, is_save=False, dataset_dir=None, save_path=None, model=None,
-                       ori_dataset_dir=None, ori_scale=0.15, ori_selected_timestamps=None,
-                       candidate_pool_scale=None):
+                       ori_dataset_dir=None, ori_scale=0.15, ori_selected_timestamps=None):
     """
     1. Random select method
     2. CooTest select method
@@ -313,7 +320,6 @@ def method_eval_result(method_stat, result_stat, model_dir, scale, is_save=False
 
     # V2X-Gen select
     gen_stat_list = method_stat['v2x_gen']
-    candidate_indices = None
 
     if split_scene:
         cootest_select_indices = select_scene_scores(result_stat, normalized_params_list, intervals, scale)
@@ -322,22 +328,11 @@ def method_eval_result(method_stat, result_stat, model_dir, scale, is_save=False
         cootest_select_indices = sorted(range(len(normalized_params_list)),
                                         key=lambda i: normalized_params_list[i],
                                         reverse=True)[:select_number]
-        if candidate_pool_scale is not None and candidate_pool_scale > scale:
-            candidate_number = min(len(gen_stat_list), int(len(gen_stat_list) * candidate_pool_scale))
-            candidate_indices = sorted(range(len(gen_stat_list)),
-                                       key=lambda i: gen_stat_list[i],
-                                       reverse=True)[:candidate_number]
-            gen_select_indices = sorted(candidate_indices,
-                                        key=lambda i: (result_stat['occ_error'][i], gen_stat_list[i]),
-                                        reverse=True)[:select_number]
-        else:
-            gen_select_indices = sorted(range(len(gen_stat_list)),
-                                        key=lambda i: gen_stat_list[i],
-                                        reverse=True)[:select_number]
+        gen_select_indices = sorted(range(len(gen_stat_list)),
+                                    key=lambda i: gen_stat_list[i],
+                                    reverse=True)[:select_number]
 
     print(len(random_select_indices), len(cootest_select_indices), len(gen_select_indices))
-    if candidate_pool_scale is not None and candidate_pool_scale > scale:
-        print(f"v2x_gen candidate pool scale = {candidate_pool_scale}")
 
     get_part_list_stat(result_stat, cootest_select_indices, cootest_result_stat)
     get_part_list_stat(result_stat, random_select_indices, random_result_stat)
@@ -363,17 +358,6 @@ def method_eval_result(method_stat, result_stat, model_dir, scale, is_save=False
     #     save_selected_data_and_label(random_result_stat['timestamp'], dataset_dir, save_path, f'random/{scale}/{model}/select')
     #     save_selected_data_and_label(gen_result_stat['timestamp'], dataset_dir, save_path, f'v2x_gen/{scale}/{model}/select')
     if is_save:
-        if candidate_indices is not None:
-            save_candidate_pool_metrics(
-                candidate_indices,
-                result_stat,
-                method_stat,
-                save_path,
-                scale,
-                model,
-                candidate_pool_scale
-            )
-
         method_save_configs = [
             ('coo_test', cootest_result_stat['timestamp'], f'coo_test/{scale}/{model}/select'),
             ('random', random_result_stat['timestamp'], f'random/{scale}/{model}/select'),
@@ -500,41 +484,6 @@ def save_method_selection_distribution(method_timestamp_dict, save_dir, scale, m
             f.write('\n')
  
     print(f'Selection distribution saved to {report_path}')
-
-
-def save_candidate_pool_metrics(candidate_indices, result_stat, method_stat,
-                                save_dir, scale, model, candidate_pool_scale):
-    report_dir = os.path.join(save_dir, 'v2x_gen', str(scale), str(model))
-    os.makedirs(report_dir, exist_ok=True)
-    report_path = os.path.join(
-        report_dir,
-        f'candidate_pool_{candidate_pool_scale}_metrics.csv'
-    )
-
-    fop_list = method_stat.get('fop', [])
-    flp_list = method_stat.get('flp', [])
-    score_list = method_stat['v2x_gen']
-
-    with open(report_path, 'w') as f:
-        f.write(
-            'candidate_rank,frame_index,folder_name,timestamp,'
-            'oe,le,total_occ,total_le,fop,flp,v2x_gen_score\n'
-        )
-        for rank, frame_index in enumerate(candidate_indices, start=1):
-            folder_name, timestamp = result_stat['timestamp'][frame_index]
-            fop = fop_list[frame_index] if frame_index < len(fop_list) else ''
-            flp = flp_list[frame_index] if frame_index < len(flp_list) else ''
-            f.write(
-                f'{rank},{frame_index},{folder_name},{timestamp},'
-                f'{result_stat["occ_error"][frame_index]},'
-                f'{result_stat["dis_error"][frame_index]},'
-                f'{result_stat["total_occ"][frame_index]},'
-                f'{result_stat["total_dis"][frame_index]},'
-                f'{fop},{flp},{score_list[frame_index]}\n'
-            )
-
-    print(f'Candidate pool metrics saved to {report_path}')
-
 
 def select_scene_scores(result_stat, score_list, scene_intervals, scale):
     selected_list = []
