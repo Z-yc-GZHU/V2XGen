@@ -126,6 +126,7 @@ DepthCamera_*.json
 /v2x_train_dataset/
 /single_trans_data/
 /MultiTest/_datasets/
+/lidargen/
 
 # RQ1：复制的原始样本及随机变换结果
 /rq1/ori_*/
