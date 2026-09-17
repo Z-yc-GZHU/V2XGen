@@ -147,3 +147,5 @@ DepthCamera_*.json
 /test1/
 
 /semantic/
+/rq2/selected_number.json
+/rq2/selected_train.json
