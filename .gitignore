@@ -117,6 +117,7 @@ DepthCamera_*.json
 /rq_eval/
 /rq2_eval_valid/
 /statistical_analysis/
+/rq2/*.csv
 
 # 数据集及其复制、切分、筛选、增强和变换结果
 # 如需提交小型示例数据，可使用 !规则显式放行。
