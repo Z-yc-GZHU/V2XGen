@@ -178,7 +178,7 @@ $ python rq2_rq2_vis.py -s ${scene_id}
 
 Rationalize all generated frames
 ```shell
-$ rq2_valid_frame_generator.py --dataset_dir ${dataset}/rq_eval/rq2_gen --model_dir model/late_fusion --dataset_type rq2 --output_dir ${dataset}/rq_eval_valid/rq2_gen
+$ python rq2_valid_frame_generator.py --dataset_dir ${dataset}/rq_eval/rq2_gen --model_dir model/late_fusion --dataset_type rq2 --output_dir ${dataset}/rq_eval_valid/rq2_gen
 ```
 
 #### 4. Evaluate train dataset and select data based on the method
