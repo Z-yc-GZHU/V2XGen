@@ -179,12 +179,19 @@ If you want to visualize the transformation result, you need to comment out the 
 $ python rq2/rq2_vis.py -s ${scene_id}
 ```
 
+Rationalize all generated frames
+```shell
+$ python rq2_valid_frame_generator.py --dataset_dir ${dataset}/rq_eval/rq2_gen --model_dir model/late_fusion --dataset_type rq2 --output_dir ${dataset}/rq_eval_valid/rq2_gen
+$ python rq2/rq2_vis.py -s ${scene_id}
+```
+
 #### 4. Evaluate train dataset and select data based on the method
 
 The experiment consisted of six models, and needed to choose different fusion methods late/early/intermediate according to the models.
 
 ```shell
-$ python opencood/rq_eval/rq2_inference.py --dataset_dir ${dataset}/rq_eval_valid/rq2_gen --model_dir model/early_fusion --fusion_method early --alpha 1.0 --beta 0.0
+$ python opencood/rq_eval/rq2_inference.py --dataset_dir ${dataset}/rq_eval_valid/rq2_gen --model_dir model/early_fusion --fusion_method early
+$ python opencood/rq_eval/rq2_inference.py --dataset_dir ${dataset}/rq_eval_valid/rq2_gen --model_dir model/early_fusion --fusion_method early --alpha 0.5 --beta 0.5
 ```
 
 ### RQ3
@@ -205,6 +212,7 @@ $ python opencood/rq_eval/rq3_train.py --dataset_dir ${project_path}/rq2/rq2_sel
 We evaluate the results of the retraining models based on three defined metrics AP_50, occlusion error and long-distance error.
 
 ```shell
+$ python opencood/rq_eval/rq3_inference.py --scale 0.15 --method v2x_gen --dataset_dir ${dataset}/rq3/rq3_test_valid --model_dir model/early_fusion --fusion_method early
 $ python opencood/rq_eval/rq3_inference.py --scale 0.15 --method v2x_gen --dataset_dir ${dataset}/rq3/rq3_test_valid --model_dir model/early_fusion --fusion_method early
 ```
 
