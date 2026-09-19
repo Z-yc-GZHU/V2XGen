@@ -173,7 +173,7 @@ $ python rq2/rq2_gen.py -m ${times}		# times in [1, 2, 3]
 If you want to visualize the transformation result, you need to comment out the visual annotations of the core/obj_insert.py and core/delete.py.
 
 ```shell
-$ python rq2_rq2_vis.py -s ${scene_id}
+$ python rq2/rq2_vis.py -s ${scene_id}
 ```
 
 Rationalize all generated frames
