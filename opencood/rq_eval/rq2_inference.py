@@ -33,8 +33,6 @@ def rq2_parser():
                         help='weight for occlusion-related score')
     parser.add_argument('--beta', type=float, default=0.0,
                         help='weight for long-distance-related score')
-    parser.add_argument('--candidate_pool_scale', type=float, default=0.3,
-                        help='top score ratio used as the V2X-Gen candidate pool')
     opt = parser.parse_args()
     return opt
 
@@ -506,8 +504,7 @@ def main():
                                       True, 
                                       opt.dataset_dir,
                                       '/home/zyc/code/V2XGen/rq2/rq2_select', 
-                                      opt.model_dir.split('/')[-1],
-                                      candidate_pool_scale=opt.candidate_pool_scale)
+                                      opt.model_dir.split('/')[-1])
 
         # model_name = opt.model_dir.split('/')[-1]
         # save_dir = f'/home/zyc/code/V2XGen/rq3/model_select/{model_name}/996'
