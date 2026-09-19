@@ -211,7 +211,7 @@ We evaluate the results of the retraining models based on three defined metrics 
 $ python opencood/rq_eval/rq3_inference.py --scale 0.15 --method v2x_gen --dataset_dir ${dataset}/rq3/rq3_test_valid --model_dir model/early_fusion --fusion_method early
 ```
 
-- `${dataset}/rq3/rq3_test_valid`: test dataset for evaluating retrained models
+- `${dataset}/rq2/rq2_select/v2x_gen/0.15/early_fusion: you can choose 0.1 scale and other retrain models
 
 
 
