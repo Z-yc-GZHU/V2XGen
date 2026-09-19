@@ -166,7 +166,6 @@ RQ2 requires three transformations of the train dataset, the resulting dataset v
 
 ```shell
 $ python rq2/rq2_gen.py -m 1  # -m 1/2/3
-$ python opencood/rq_eval/rq2_valid_frame_generator.py --dataset_dir ${dataset}/rq_eval/rq2_gen --model_dir model/late_fusion --dataset_type rq2 --output_dir ${dataset}/rq_eval_valid/rq2_gen
 ```
 
 #### 3. Visulize
